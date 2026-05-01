@@ -2,14 +2,21 @@
 Django settings for proconnect project.
 """
 
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-proconnect-secret-key-change-in-production-xyz123'
-DEBUG = False
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-proconnect-secret-key-change-in-production-xyz123')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['2400040295nandhan.pythonanywhere.com']
+ALLOWED_HOSTS = [
+    '2400040295nandhan.pythonanywhere.com',
+    '.vercel.app',
+    'localhost',
+    '127.0.0.1',
+    '*',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,6 +33,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,6 +83,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

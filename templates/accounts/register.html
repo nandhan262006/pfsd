@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Register — ProConnect{% endblock %}
+{% block content %}
+<div class="form-container" style="max-width:680px;">
+  <h1 class="form-title">Create Your Account</h1>
+  <p class="form-sub">Join thousands of users on ProConnect</p>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Role Selection -->
+    <div class="form-group">
+      <label>I want to join as:</label>
+      <div class="role-options">
+        <div class="role-option">
+          <input type="radio" name="role" id="role_user" value="user" checked>
+          <label for="role_user">
+            <span class="role-icon">👤</span>
+            <strong>Regular User</strong>
+            <span style="font-size:0.8rem;color:#888;">Book services</span>
+          </label>
+        </div>
+        <div class="role-option">
+          <input type="radio" name="role" id="role_pro" value="professional">
+          <label for="role_pro">
+            <span class="role-icon">🔧</span>
+            <strong>Professional</strong>
+            <span style="font-size:0.8rem;color:#888;">Offer services</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid-2" style="gap:14px;">
+      <div class="form-group">
+        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+        {{ form.first_name }}
+        {{ form.first_name.errors }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+        {{ form.last_name }}
+        {{ form.last_name.errors }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.email.id_for_label }}">Email Address</label>
+      {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.phone.id_for_label }}">Phone (optional)</label>
+      {{ form.phone }}
+      {{ form.phone.errors }}
+    </div>
+    <div class="card-grid-2" style="gap:14px;">
+      <div class="form-group">
+        <label for="{{ form.password1.id_for_label }}">Password</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+    </div>
+
+    <!-- Professional fields (shown via JS) -->
+    <div id="prof-fields" style="display:none;">
+      <hr class="divider">
+      <p style="font-weight:700;color:#1a2e4a;margin-bottom:16px;">Professional Details</p>
+      <div class="card-grid-2" style="gap:14px;">
+        <div class="form-group">
+          <label>Category</label>
+          {{ prof_form.category }}
+          {{ prof_form.category.errors }}
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          {{ prof_form.location }}
+          {{ prof_form.location.errors }}
+        </div>
+        <div class="form-group">
+          <label>Years of Experience</label>
+          {{ prof_form.experience_years }}
+          {{ prof_form.experience_years.errors }}
+        </div>
+        <div class="form-group">
+          <label>Hourly Rate (₹)</label>
+          {{ prof_form.hourly_rate }}
+          {{ prof_form.hourly_rate.errors }}
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">Create Account →</button>
+  </form>
+  <div class="form-footer">Already have an account? <a href="{% url 'login' %}">Login here</a></div>
+</div>
+
+<script>
+  const radios = document.querySelectorAll('input[name="role"]');
+  const profFields = document.getElementById('prof-fields');
+  function toggleProf() {
+    profFields.style.display = document.querySelector('input[name="role"]:checked').value === 'professional' ? 'block' : 'none';
+  }
+  radios.forEach(r => r.addEventListener('change', toggleProf));
+  toggleProf();
+</script>
+{% endblock %}

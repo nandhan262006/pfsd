@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ProConnect — Find and hire trusted professionals near you. Electricians, tutors, designers, plumbers and more.">
+  <title>{% block title %}ProConnect — Hire Trusted Professionals{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="{% url 'home' %}" class="navbar-brand">Pro<span>Connect</span></a>
+  <ul class="navbar-links">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'browse' %}">Browse</a></li>
+    {% if user.is_authenticated %}
+      {% if user.role == 'professional' %}
+        <li><a href="{% url 'professional_bookings' %}">Bookings</a></li>
+        <li><a href="{% url 'add_service' %}">+ Service</a></li>
+      {% else %}
+        <li><a href="{% url 'my_bookings' %}">My Bookings</a></li>
+      {% endif %}
+    {% endif %}
+  </ul>
+  <div class="navbar-user">
+    {% if user.is_authenticated %}
+      <span class="badge badge-{{ user.role }}">{{ user.role }}</span>
+      <a href="{% url 'profile' %}" style="color:#cdd9e5; font-weight:600;">{{ user.get_full_name|default:user.username }}</a>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm" style="color:#f4883f;">Logout</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn-outline btn-sm">Login</a>
+      <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages-container">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer>
+  <p>&copy; 2024 <span>ProConnect</span>. All rights reserved. Find trusted professionals near you.</p>
+</footer>
+
+</body>
+</html>

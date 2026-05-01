@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}{{ prof.full_name }} — ProConnect{% endblock %}
+{% block content %}
+<div class="container section">
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-avatar-lg">
+      {% if prof.user.profile_picture %}
+        <img src="{{ prof.user.profile_picture.url }}" alt="{{ prof.full_name }}">
+      {% else %}
+        {{ prof.user.first_name|first|upper }}{{ prof.user.last_name|first|upper }}
+      {% endif %}
+    </div>
+    <div class="profile-info">
+      <h2>{{ prof.full_name }}
+        {% if prof.is_verified %}<span class="badge badge-verified" style="font-size:0.7rem;">✓ Verified</span>{% endif %}
+      </h2>
+      <p class="sub">{{ prof.get_category_display }}</p>
+      <p style="margin-top:8px;">📍 {{ prof.location }} &nbsp;•&nbsp; ₹{{ prof.hourly_rate }}/hr &nbsp;•&nbsp; {{ prof.experience_years }} yrs exp</p>
+      <p>
+        <span class="stars">{% for i in star_range %}{% if i <= prof.avg_rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+        {{ prof.avg_rating|floatformat:1 }}/5 &nbsp;•&nbsp;
+        {% if prof.availability %}🟢 Available{% else %}🔴 Not Available{% endif %}
+      </p>
+    </div>
+  </div>
+
+  {% if prof.user.bio %}
+  <div class="card mb-2">
+    <h3 style="color:#1a2e4a;margin-bottom:12px;">About</h3>
+    <p style="color:#555;line-height:1.8;">{{ prof.user.bio }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Services -->
+  <h3 style="color:#1a2e4a;margin-bottom:16px;">Services Offered ({{ services.count }})</h3>
+  {% if services %}
+  <div class="card-grid mb-2">
+    {% for svc in services %}
+    <div class="card">
+      <h4 style="color:#1a2e4a;margin-bottom:8px;">{{ svc.title }}</h4>
+      <span class="badge" style="background:#f0f4f8;color:#1a2e4a;margin-bottom:10px;display:inline-block;">{{ svc.get_category_display }}</span>
+      <p style="color:#666;font-size:0.87rem;margin-bottom:14px;">{{ svc.description|truncatewords:25 }}</p>
+      <div class="flex justify-between items-center">
+        <div>
+          <span style="font-weight:700;color:#f4883f;font-size:1.05rem;">₹{{ svc.price }}</span>
+          <span style="color:#888;font-size:0.82rem;"> / {{ svc.duration_hours }}hr</span>
+        </div>
+        {% if user.is_authenticated and user.role == 'user' %}
+          <a href="{% url 'book_service' svc.pk %}" class="btn btn-primary btn-sm">Book Now</a>
+        {% elif not user.is_authenticated %}
+          <a href="{% url 'login' %}?next={% url 'book_service' svc.pk %}" class="btn btn-primary btn-sm">Book Now</a>
+        {% else %}
+          <a href="{% url 'service_detail' svc.pk %}" class="btn btn-outline btn-sm">Details</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty-state mb-2"><div class="icon">📦</div><p>No services listed yet.</p></div>
+  {% endif %}
+
+  <!-- Reviews -->
+  <h3 style="color:#1a2e4a;margin-bottom:16px;">Reviews ({{ reviews.count }})</h3>
+  {% if reviews %}
+  <div class="card-grid">
+    {% for review in reviews %}
+    <div class="card">
+      <div class="flex justify-between items-center mb-1">
+        <strong>{{ review.reviewer.get_full_name|default:review.reviewer.username }}</strong>
+        <span class="stars" style="font-size:0.9rem;">{% for i in star_range %}{% if i <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+      </div>
+      <p style="color:#555;font-size:0.9rem;">{{ review.comment }}</p>
+      <p style="color:#aaa;font-size:0.78rem;margin-top:8px;">{{ review.created_at|date:"M d, Y" }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty-state"><div class="icon">💬</div><p>No reviews yet. Be the first to book and review!</p></div>
+  {% endif %}
+
+</div>
+{% endblock %}

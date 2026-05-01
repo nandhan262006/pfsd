@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — ProConnect{% endblock %}
+{% block content %}
+<div class="container section">
+
+  <div class="profile-header">
+    <div class="profile-avatar-lg">
+      {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+      {% else %}
+        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+      {% endif %}
+    </div>
+    <div class="profile-info">
+      <h2>{{ user.get_full_name|default:user.username }}</h2>
+      <p class="sub">@{{ user.username }} &nbsp;•&nbsp; <span class="badge badge-{{ user.role }}">{{ user.role }}</span></p>
+      {% if user.email %}<p style="margin-top:8px;">✉️ {{ user.email }}</p>{% endif %}
+      {% if user.phone %}<p>📞 {{ user.phone }}</p>{% endif %}
+      {% if user.bio %}<p style="margin-top:8px;color:#cdd9e5;">{{ user.bio }}</p>{% endif %}
+    </div>
+    <div style="margin-left:auto;">
+      <a href="{% url 'profile_edit' %}" class="btn btn-outline">✏️ Edit Profile</a>
+    </div>
+  </div>
+
+  {% if prof_profile %}
+  <div class="card mb-2">
+    <h3 style="color:#1a2e4a;margin-bottom:16px;">Professional Details
+      {% if prof_profile.is_verified %}
+        <span class="badge badge-verified">✓ Verified</span>
+      {% else %}
+        <span class="badge badge-pending">Pending Verification</span>
+      {% endif %}
+    </h3>
+    <div class="card-grid" style="margin:0;">
+      <div><strong>Category</strong><br><span style="color:#f4883f;">{{ prof_profile.get_category_display }}</span></div>
+      <div><strong>Location</strong><br>📍 {{ prof_profile.location }}</div>
+      <div><strong>Experience</strong><br>{{ prof_profile.experience_years }} years</div>
+      <div><strong>Hourly Rate</strong><br>₹{{ prof_profile.hourly_rate }}/hr</div>
+      <div><strong>Avg Rating</strong><br>⭐ {{ prof_profile.avg_rating|floatformat:1 }}/5.0</div>
+      <div><strong>Availability</strong><br>{% if prof_profile.availability %}🟢 Available{% else %}🔴 Not Available{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-2">
+    <h3 style="color:#1a2e4a;">My Services ({{ prof_profile.services.count }})</h3>
+    <a href="{% url 'add_service' %}" class="btn btn-primary btn-sm">+ Add Service</a>
+  </div>
+  {% if prof_profile.services.all %}
+  <div class="card-grid">
+    {% for svc in prof_profile.services.all %}
+    <div class="card">
+      <h4 style="color:#1a2e4a;margin-bottom:8px;">{{ svc.title }}</h4>
+      <p style="color:#888;font-size:0.85rem;margin-bottom:12px;">{{ svc.description|truncatewords:20 }}</p>
+      <div class="flex justify-between items-center">
+        <span style="font-weight:700;color:#f4883f;">₹{{ svc.price }}</span>
+        <div class="flex gap-2">
+          <a href="{% url 'service_detail' svc.pk %}" class="btn btn-outline btn-sm">View</a>
+          <form method="post" action="{% url 'delete_service' svc.pk %}" style="display:inline;" onsubmit="return confirm('Delete this service?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty-state"><div class="icon">📦</div><p>No services added yet.</p></div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">
+    <div class="icon">📋</div>
+    <p>Welcome, {{ user.first_name|default:user.username }}! Start browsing services or <a href="{% url 'browse' %}" style="color:#f4883f;">find a professional</a>.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

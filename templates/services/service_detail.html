@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.title }} — ProConnect{% endblock %}
+{% block content %}
+<div class="container section">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="card">
+      <div class="flex justify-between items-center mb-2">
+        <span class="badge" style="background:#f0f4f8;color:#1a2e4a;">{{ service.get_category_display }}</span>
+        <span style="color:#888;font-size:0.85rem;">Posted by {{ service.professional.full_name }}</span>
+      </div>
+      <h1 style="color:#1a2e4a;font-size:1.8rem;margin-bottom:12px;">{{ service.title }}</h1>
+      <p style="color:#555;line-height:1.9;margin-bottom:24px;">{{ service.description }}</p>
+      <div class="card-grid" style="margin:0 0 24px;">
+        <div style="text-align:center;padding:16px;background:#f8f9fb;border-radius:10px;">
+          <div style="font-size:1.5rem;font-weight:800;color:#f4883f;">₹{{ service.price }}</div>
+          <div style="font-size:0.82rem;color:#888;">Price</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:#f8f9fb;border-radius:10px;">
+          <div style="font-size:1.5rem;font-weight:800;color:#1a2e4a;">{{ service.duration_hours }}h</div>
+          <div style="font-size:0.82rem;color:#888;">Duration</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:#f8f9fb;border-radius:10px;">
+          <div style="font-size:1.5rem;font-weight:800;color:#1a2e4a;">⭐ {{ service.professional.avg_rating|floatformat:1 }}</div>
+          <div style="font-size:0.82rem;color:#888;">Prof. Rating</div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        {% if user.is_authenticated and user.role == 'user' %}
+          <a href="{% url 'book_service' service.pk %}" class="btn btn-primary">📅 Book This Service</a>
+        {% elif not user.is_authenticated %}
+          <a href="{% url 'login' %}" class="btn btn-primary">Login to Book</a>
+        {% endif %}
+        <a href="{% url 'professional_profile' service.professional.pk %}" class="btn btn-outline">View Professional →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

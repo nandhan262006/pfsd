@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Leave a Review — ProConnect{% endblock %}
+{% block content %}
+<div class="form-container">
+  <h1 class="form-title">Leave a Review ⭐</h1>
+  <div class="card" style="background:#f8f9fb;margin-bottom:24px;padding:16px;">
+    <strong>{{ booking.service.title }}</strong>
+    <p style="color:#888;font-size:0.85rem;margin-top:4px;">by {{ booking.service.professional.full_name }} on {{ booking.booking_date|date:"M d, Y" }}</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Your Rating</label>
+      <div class="star-rating-input">
+        {% for val, label in form.rating.field.choices %}
+        <input type="radio" name="rating" id="star{{ val }}" value="{{ val }}" {% if form.rating.value == val|stringformat:"s" %}checked{% endif %}>
+        <label for="star{{ val }}" title="{{ val }} stars">★</label>
+        {% endfor %}
+      </div>
+      {{ form.rating.errors }}
+    </div>
+    <div class="form-group">
+      <label>Your Comment</label>
+      {{ form.comment }}
+      {{ form.comment.errors }}
+    </div>
+    <div class="flex gap-2 mt-3">
+      <button type="submit" class="btn btn-primary">Submit Review</button>
+      <a href="{% url 'my_bookings' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

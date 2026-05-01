@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Browse Professionals — ProConnect{% endblock %}
+{% block content %}
+<div class="container section">
+  <h1 class="section-title">Browse Professionals</h1>
+  <p class="section-sub">{{ professionals.count }} verified professional{{ professionals.count|pluralize }} found</p>
+
+  <div class="browse-layout">
+
+    <!-- Sidebar Filters -->
+    <aside class="sidebar">
+      <h3>🔍 Filters</h3>
+      <form method="get" action="{% url 'browse' %}">
+        <div class="filter-group">
+          <label>Category</label>
+          <select name="category" class="form-input">
+            <option value="">All Categories</option>
+            {% for val, label in categories %}
+              <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Location</label>
+          <input type="text" name="location" value="{{ location }}" placeholder="Search location..." class="form-input">
+        </div>
+        <div class="filter-group">
+          <label>Minimum Rating</label>
+          <select name="min_rating" class="form-input">
+            <option value="">Any Rating</option>
+            {% for r in "12345" %}
+              <option value="{{ r }}" {% if selected_rating == r %}selected{% endif %}>{{ r }}★ & above</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" name="available" value="1" {% if available_only %}checked{% endif %}> Available Only
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Apply Filters</button>
+        <a href="{% url 'browse' %}" class="btn btn-secondary" style="width:100%;margin-top:8px;">Clear</a>
+      </form>
+    </aside>
+
+    <!-- Results -->
+    <div>
+      {% if professionals %}
+      <div class="card-grid">
+        {% for prof in professionals %}
+        <div class="card prof-card">
+          <div class="prof-card-header">
+            <div class="prof-avatar">
+              {% if prof.user.profile_picture %}
+                <img src="{{ prof.user.profile_picture.url }}" alt="{{ prof.full_name }}">
+              {% else %}
+                {{ prof.user.first_name|first|upper }}{{ prof.user.last_name|first|upper }}
+              {% endif %}
+            </div>
+            <div>
+              <div class="prof-name">{{ prof.full_name }}</div>
+              <div class="prof-category">{{ prof.get_category_display }}</div>
+              <span class="badge badge-verified">✓ Verified</span>
+            </div>
+          </div>
+          <div class="prof-meta">
+            <span class="stars">{% for i in "12345" %}{% if forloop.counter <= prof.avg_rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+            <span class="stars-count">{{ prof.avg_rating|floatformat:1 }}</span>
+          </div>
+          <div class="prof-meta">
+            <span>📍 {{ prof.location }}</span>
+            <span>•</span>
+            <span>{{ prof.experience_years }} yrs</span>
+            <span>•</span>
+            {% if prof.availability %}<span style="color:#10b981;">🟢 Available</span>{% else %}<span style="color:#ef4444;">🔴 Busy</span>{% endif %}
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <span class="prof-rate">₹{{ prof.hourly_rate }}/hr</span>
+            <a href="{% url 'professional_profile' prof.pk %}" class="btn btn-primary btn-sm">View Profile</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <h3>No professionals found</h3>
+        <p>Try adjusting your filters or <a href="{% url 'browse' %}" style="color:#f4883f;">clear all filters</a>.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

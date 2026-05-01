@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ProConnect — Find Trusted Professionals Near You{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1>Find <span>Trusted Professionals</span><br>Near You</h1>
+    <p>Book verified electricians, tutors, designers, plumbers & more — in minutes.</p>
+    <form method="get" action="{% url 'home' %}" class="hero-search">
+      <input type="text" name="q" placeholder="e.g. Electrician, Designer..." value="{{ request.GET.q }}">
+      <input type="text" name="location" placeholder="City or location..." value="{{ request.GET.location }}" style="border-radius:8px;padding:14px 20px;border:none;font-size:1rem;outline:none;">
+      <button type="submit">🔍 Search</button>
+    </form>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section" style="background:#f8f9fb;">
+  <div class="container">
+    <h2 class="section-title">Browse by Category</h2>
+    <p class="section-sub">Find the right professional for every job</p>
+    <div class="categories-grid">
+      {% for val, label in categories %}
+      <a href="{% url 'browse' %}?category={{ val }}" class="category-card">
+        <div class="category-icon">
+          {% if val == 'electrician' %}⚡{% elif val == 'plumber' %}🔧{% elif val == 'tutor' %}📚{% elif val == 'designer' %}🎨{% elif val == 'cleaner' %}🧹{% elif val == 'carpenter' %}🪚{% elif val == 'painter' %}🖌️{% elif val == 'mechanic' %}🔩{% elif val == 'photographer' %}📷{% else %}💼{% endif %}
+        </div>
+        <div class="category-name">{{ label }}</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PROFESSIONALS -->
+<section class="section">
+  <div class="container">
+    <div class="flex justify-between items-center mb-2">
+      <div>
+        <h2 class="section-title">Featured Professionals</h2>
+        <p class="section-sub">Top-rated verified experts ready to help</p>
+      </div>
+      <a href="{% url 'browse' %}" class="btn btn-outline">View All →</a>
+    </div>
+
+    {% if featured %}
+    <div class="card-grid">
+      {% for prof in featured %}
+      <div class="card prof-card">
+        <div class="prof-card-header">
+          <div class="prof-avatar">
+            {% if prof.user.profile_picture %}
+              <img src="{{ prof.user.profile_picture.url }}" alt="{{ prof.full_name }}">
+            {% else %}
+              {{ prof.user.first_name|first|upper }}{{ prof.user.last_name|first|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <div class="prof-name">{{ prof.full_name }}</div>
+            <div class="prof-category">{{ prof.get_category_display }}</div>
+            {% if prof.is_verified %}<span class="badge badge-verified">✓ Verified</span>{% endif %}
+          </div>
+        </div>
+        <div class="prof-meta">
+          <span class="stars">
+            {% for i in prof.star_range %}{% if i <= prof.avg_rating %}★{% else %}☆{% endif %}{% endfor %}
+          </span>
+          <span class="stars-count">{{ prof.avg_rating|floatformat:1 }}</span>
+          <span>•</span>
+          <span class="prof-location">📍 {{ prof.location }}</span>
+        </div>
+        <div class="flex justify-between items-center mt-2">
+          <span class="prof-rate">₹{{ prof.hourly_rate }}/hr</span>
+          <a href="{% url 'professional_profile' prof.pk %}" class="btn btn-primary btn-sm">View Profile</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="icon">👷</div>
+      <p>No featured professionals yet. <a href="{% url 'register' %}" style="color:#f4883f;">Register as a professional!</a></p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background:#f8f9fb;">
+  <div class="container text-center">
+    <h2 class="section-title">How ProConnect Works</h2>
+    <p class="section-sub">Three simple steps to get help</p>
+    <div class="card-grid" style="margin-top:24px;">
+      <div class="card text-center">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔍</div>
+        <h3 style="color:#1a2e4a;margin-bottom:8px;">Search</h3>
+        <p style="color:#666;font-size:0.9rem;">Browse verified professionals by category or location</p>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2.5rem;margin-bottom:16px;">📅</div>
+        <h3 style="color:#1a2e4a;margin-bottom:8px;">Book</h3>
+        <p style="color:#666;font-size:0.9rem;">Select a service, pick a date & time, confirm your booking</p>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2.5rem;margin-bottom:16px;">⭐</div>
+        <h3 style="color:#1a2e4a;margin-bottom:8px;">Review</h3>
+        <p style="color:#666;font-size:0.9rem;">After the job, leave a review to help others decide</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

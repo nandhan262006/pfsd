@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ service.title }} — ProConnect{% endblock %}
+{% block content %}
+<div class="form-container" style="max-width:580px;">
+  <h1 class="form-title">Book Service</h1>
+  <div class="card" style="background:#f8f9fb;margin-bottom:24px;padding:16px;">
+    <strong style="color:#1a2e4a;">{{ service.title }}</strong>
+    <p style="color:#888;font-size:0.85rem;margin-top:4px;">by {{ service.professional.full_name }} &nbsp;•&nbsp; ₹{{ service.price }}</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Booking Date</label>
+      {{ form.booking_date }}
+      {{ form.booking_date.errors }}
+    </div>
+    <div class="form-group">
+      <label>Preferred Time</label>
+      {{ form.booking_time }}
+      {{ form.booking_time.errors }}
+    </div>
+    <div class="form-group">
+      <label>Special Instructions (optional)</label>
+      {{ form.notes }}
+      {{ form.notes.errors }}
+    </div>
+    <div class="flex gap-2 mt-3">
+      <button type="submit" class="btn btn-primary">✅ Confirm Booking</button>
+      <a href="{% url 'professional_profile' service.professional.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

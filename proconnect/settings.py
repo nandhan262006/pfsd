@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-proconnect-secret-key-change-in-production-xyz123')
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'False'
 
 # Detect Vercel environment
 ON_VERCEL = os.environ.get('VERCEL', False)

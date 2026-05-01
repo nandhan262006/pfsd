@@ -8,7 +8,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-proconnect-secret-key-change-in-production-xyz123')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+# Detect Vercel environment
+ON_VERCEL = os.environ.get('VERCEL', False)
 
 ALLOWED_HOSTS = [
     '2400040295nandhan.pythonanywhere.com',
@@ -16,6 +19,11 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '*',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'https://2400040295nandhan.pythonanywhere.com',
 ]
 
 INSTALLED_APPS = [
@@ -62,10 +70,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'proconnect.wsgi.application'
+# Vercel has a read-only filesystem — SQLite must live in /tmp
+if ON_VERCEL:
+    DB_PATH = '/tmp/db.sqlite3'
+else:
+    DB_PATH = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_PATH,
     }
 }
 AUTH_PASSWORD_VALIDATORS = [
@@ -83,7 +97,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Django 4.2+ requires STORAGES dict instead of STATICFILES_STORAGE
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 WHITENOISE_USE_FINDERS = True
 
 MEDIA_URL = '/media/'
